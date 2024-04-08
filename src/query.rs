@@ -1,7 +1,6 @@
 use std::str::FromStr;
 
-use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdResult, Timestamp, Uint256};
-use chrono::{DateTime, Utc};
+use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdResult, Uint256};
 
 use crate::slinky_query_proto::{GetAllCurrencyPairsRequest, GetPricesRequest};
 use crate::state::Contract;
@@ -61,22 +60,11 @@ impl<'a> Contract {
     }
 }
 
-fn iso_string_to_timestamp(iso_string: &String) -> Timestamp {
-    let timestamp_str = iso_string;
-    let datetime: DateTime<Utc> = timestamp_str.parse().expect("Invalid timestamp");
-
-    // Extract the second and nanosecond components
-    let seconds = datetime.timestamp();
-    let nanoseconds = datetime.timestamp_subsec_nanos();
-
-    Timestamp::from_nanos((seconds as u64) * 1_000_000_000 + (nanoseconds as u64))
-}
-
 fn convert_raw_price_response(raw_response: &GetPriceResponseRaw) -> GetPriceResponse {
     GetPriceResponse {
         price: QuotePrice {
             price: Uint256::from_str(&raw_response.price.price).unwrap(),
-            block_timestamp: iso_string_to_timestamp(&raw_response.price.block_timestamp),
+            block_timestamp: raw_response.price.block_timestamp.clone(),
             block_height: u64::from_str(&raw_response.price.block_height).unwrap(),
         },
         nonce: u64::from_str(&raw_response.nonce).unwrap(),
@@ -126,7 +114,7 @@ pub struct GetPricesResponse {
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct QuotePrice {
     pub price: Uint256,
-    pub block_timestamp: Timestamp,
+    pub block_timestamp: String, // TODO: change this comsos_std::Timestamp
     pub block_height: u64,
 }
 
