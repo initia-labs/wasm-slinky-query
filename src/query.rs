@@ -1,11 +1,12 @@
 use std::str::FromStr;
 
-use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdResult, Uint256};
+use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdResult, Timestamp, Uint256};
 
 use crate::slinky_query_proto::{GetAllCurrencyPairsRequest, GetPricesRequest};
 use crate::state::Contract;
 use crate::msgs::QueryMsg;
-use crate::slinky_query_proto::{GetPriceRequest, get_price_request::Currency_pair_selector, };
+use crate::slinky_query_proto::{GetPriceRequest, get_price_request::Currency_pair_selector};
+use crate::timestamp::convert_iso_string_to_timestamp;
 use protobuf::Message;
 
 impl<'a> Contract {
@@ -64,7 +65,7 @@ fn convert_raw_price_response(raw_response: &GetPriceResponseRaw) -> GetPriceRes
     GetPriceResponse {
         price: QuotePrice {
             price: Uint256::from_str(&raw_response.price.price).unwrap(),
-            block_timestamp: raw_response.price.block_timestamp.clone(),
+            block_timestamp: convert_iso_string_to_timestamp(&raw_response.price.block_timestamp),
             block_height: u64::from_str(&raw_response.price.block_height).unwrap(),
         },
         nonce: u64::from_str(&raw_response.nonce).unwrap(),
@@ -114,7 +115,7 @@ pub struct GetPricesResponse {
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct QuotePrice {
     pub price: Uint256,
-    pub block_timestamp: String, // TODO: change this comsos_std::Timestamp
+    pub block_timestamp: Timestamp,
     pub block_height: u64,
 }
 

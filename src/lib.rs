@@ -3,6 +3,7 @@ mod state;
 mod msgs;
 mod query;
 mod slinky_query_proto;
+mod timestamp;
 
 use crate::msgs::{InstantiateMsg, ExecuteMsg, 
     // QueryMsg, MigrateMsg
