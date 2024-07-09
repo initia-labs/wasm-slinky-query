@@ -19,7 +19,8 @@ Get oracle price
 ```json
 {
   "get_price": {
-    "pair_id": "BITCOIN/USD" // {Base}/{Quote}
+    "base": "BITCOIN",
+    "quote": "USD"
   }
 }
 ```
@@ -45,7 +46,7 @@ Get oracle prices
 
 ```json
 {
-  "get_scores": {
+  "get_pricess": {
     "pair_ids": ["BITCOIN/USD"] // {Base}/{Quote}
   }
 }

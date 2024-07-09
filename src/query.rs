@@ -2,17 +2,16 @@ use std::str::FromStr;
 
 use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdResult, Timestamp, Uint256};
 
-use crate::slinky_query_proto::{GetAllCurrencyPairsRequest, GetPricesRequest};
 use crate::state::Contract;
 use crate::msgs::QueryMsg;
-use crate::slinky_query_proto::{GetPriceRequest, get_price_request::Currency_pair_selector};
+use crate::slinky_oracle::{GetAllCurrencyPairsRequest, GetPricesRequest, GetPriceRequest, CurrencyPair};
 use crate::timestamp::convert_iso_string_to_timestamp;
-use protobuf::Message;
+use protobuf::{Message, MessageField};
 
 impl<'a> Contract {
-    fn get_price(&self, deps: Deps, _env: Env, pair_id: String) -> StdResult<GetPriceResponse> {
+    fn get_price(&self, deps: Deps, _env: Env, base: String, quote: String) -> StdResult<GetPriceResponse> {
         let request = GetPriceRequest { 
-            currency_pair_selector: Some(Currency_pair_selector::CurrencyPairId(pair_id)),
+            currency_pair:MessageField::some(CurrencyPair{ Base: base, Quote: quote, special_fields: ::protobuf::SpecialFields::new() }),
             special_fields: ::protobuf::SpecialFields::new()
         };
         let bytes = request.write_to_bytes().unwrap();
@@ -22,6 +21,7 @@ impl<'a> Contract {
         let res: GetPriceResponseRaw = deps.querier.query(&request)?;
         Ok(convert_raw_price_response(&res))
     }
+
     fn get_prices(&self, deps: Deps, _env: Env, pair_ids: Vec<String>) -> StdResult<GetPricesResponse> {
         let request = GetPricesRequest { 
             currency_pair_ids: pair_ids,
@@ -54,7 +54,7 @@ impl<'a> Contract {
 impl<'a> Contract {
     pub fn query(&self, deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
         match msg {
-            QueryMsg::GetPrice { pair_id } => to_json_binary(&self.get_price(deps, env, pair_id)?),
+            QueryMsg::GetPrice { base, quote } => to_json_binary(&self.get_price(deps, env, base, quote)?),
             QueryMsg::GetPrices { pair_ids } => to_json_binary(&self.get_prices(deps, env, pair_ids)?),
             QueryMsg::GetAllCurrencyPairs {} => to_json_binary(&self.get_all_currency_pairs(deps, env)?),
         }
@@ -121,11 +121,11 @@ pub struct QuotePrice {
 
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct GetAllCurrencyPairsResponse {
-    pub currency_pairs: Vec<CurrencyPair>,
+    pub currency_pairs: Vec<CurrencyPairResponse>,
 }
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 #[allow(non_snake_case)]
-pub struct CurrencyPair {
+pub struct CurrencyPairResponse {
     pub Base: String,
     pub Quote: String,
 }
