@@ -821,7 +821,17 @@ dependencies = [
  "protoc-bin-vendored",
  "schemars",
  "serde",
+ "slinky_wasm",
  "thiserror",
+]
+
+[[package]]
+name = "slinky_wasm"
+version = "0.0.1"
+dependencies = [
+ "cosmwasm-std",
+ "schemars",
+ "serde",
 ]
 
 [[package]]
