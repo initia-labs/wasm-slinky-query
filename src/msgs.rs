@@ -15,8 +15,7 @@ pub enum ExecuteMsg {
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
   GetPrice {
-    base: String,
-    quote: String,
+    pair_id: String
   },
   GetPrices {
     pair_ids: Vec<String>

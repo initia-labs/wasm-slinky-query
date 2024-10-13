@@ -4,20 +4,20 @@ use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdRe
 
 use crate::state::Contract;
 use crate::msgs::QueryMsg;
-use crate::slinky_oracle::{GetAllCurrencyPairsRequest, GetPricesRequest, GetPriceRequest, CurrencyPair};
+use crate::slinky_oracle::{GetAllCurrencyPairsRequest, GetPricesRequest, GetPriceRequest};
 use crate::timestamp::convert_iso_string_to_timestamp;
-use protobuf::{Message, MessageField};
+use protobuf::Message;
 
 impl<'a> Contract {
-    fn get_price(&self, deps: Deps, _env: Env, base: String, quote: String) -> StdResult<GetPriceResponse> {
+    fn get_price(&self, deps: Deps, _env: Env, pair_id: String) -> StdResult<GetPriceResponse> {
         let request = GetPriceRequest { 
-            currency_pair:MessageField::some(CurrencyPair{ Base: base, Quote: quote, special_fields: ::protobuf::SpecialFields::new() }),
+            currency_pair: pair_id,
             special_fields: ::protobuf::SpecialFields::new()
         };
         let bytes = request.write_to_bytes().unwrap();
         
         let data = Binary::from(bytes);
-        let request = QueryRequest::Stargate{path: "/slinky.oracle.v1.Query/GetPrice".to_string(), data};
+        let request = QueryRequest::Stargate{path: "/connect.oracle.v2.Query/GetPrice".to_string(), data};
         let res: GetPriceResponseRaw = deps.querier.query(&request)?;
         Ok(convert_raw_price_response(&res))
     }
@@ -30,7 +30,7 @@ impl<'a> Contract {
         let bytes = request.write_to_bytes().unwrap();
         
         let data = Binary::from(bytes);
-        let request = QueryRequest::Stargate{path: "/slinky.oracle.v1.Query/GetPrices".to_string(), data};
+        let request = QueryRequest::Stargate{path: "/connect.oracle.v2.Query/GetPrices".to_string(), data};
         let raw_res: GetPricesResponseRaw = deps.querier.query(&request)?;
         let res = GetPricesResponse {
             prices: raw_res.prices.into_iter().map(|raw| convert_raw_price_response(&raw)).collect()
@@ -44,7 +44,7 @@ impl<'a> Contract {
         let bytes = request.write_to_bytes().unwrap();
 
         let data = Binary::from(bytes);
-        let request = QueryRequest::<Empty>::Stargate{path: "/slinky.oracle.v1.Query/GetAllCurrencyPairs".to_string(), data};
+        let request = QueryRequest::<Empty>::Stargate{path: "/connect.oracle.v2.Query/GetAllCurrencyPairs".to_string(), data};
         let res: GetAllCurrencyPairsResponse = deps.querier.query(&request)?;
         Ok(res)
     }
@@ -54,7 +54,7 @@ impl<'a> Contract {
 impl<'a> Contract {
     pub fn query(&self, deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
         match msg {
-            QueryMsg::GetPrice { base, quote } => to_json_binary(&self.get_price(deps, env, base, quote)?),
+            QueryMsg::GetPrice { pair_id } => to_json_binary(&self.get_price(deps, env, pair_id)?),
             QueryMsg::GetPrices { pair_ids } => to_json_binary(&self.get_prices(deps, env, pair_ids)?),
             QueryMsg::GetAllCurrencyPairs {} => to_json_binary(&self.get_all_currency_pairs(deps, env)?),
         }
