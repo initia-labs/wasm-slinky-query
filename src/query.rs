@@ -1,9 +1,12 @@
 use std::str::FromStr;
 
 use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdResult, Uint256};
+use slinky_wasm::oracle::{GetPriceResponse, GetPricesResponse, QuotePrice, GetAllCurrencyPairsResponse};
+
 
 use crate::msgs::QueryMsg;
 use crate::slinky_oracle::{GetAllCurrencyPairsRequest, GetPricesRequest, GetPriceRequest};
+use crate::state::Contract;
 use crate::timestamp::convert_iso_string_to_timestamp;
 use protobuf::Message;
 

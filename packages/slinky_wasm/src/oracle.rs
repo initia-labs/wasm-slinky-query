@@ -15,7 +15,7 @@ pub enum ExecuteMsg {
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 #[serde(rename_all = "snake_case")]
 pub enum QueryMsg {
-    GetPrice { base: String, quote: String },
+    GetPrice { pair_id: String },
     GetPrices { pair_ids: Vec<String> },
     GetAllCurrencyPairs {},
 }
