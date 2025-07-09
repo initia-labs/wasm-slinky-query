@@ -555,7 +555,7 @@ impl ::protobuf::reflect::ProtobufValue for GetAllCurrencyPairsResponse {
 pub struct GetPriceRequest {
     // message fields
     // @@protoc_insertion_point(field:GetPriceRequest.currency_pair)
-    pub currency_pair: ::protobuf::MessageField<CurrencyPair>,
+    pub currency_pair: ::std::string::String,
     // special fields
     // @@protoc_insertion_point(special_field:GetPriceRequest.special_fields)
     pub special_fields: ::protobuf::SpecialFields,
@@ -575,7 +575,7 @@ impl GetPriceRequest {
     fn generated_message_descriptor_data() -> ::protobuf::reflect::GeneratedMessageDescriptorData {
         let mut fields = ::std::vec::Vec::with_capacity(1);
         let mut oneofs = ::std::vec::Vec::with_capacity(0);
-        fields.push(::protobuf::reflect::rt::v2::make_message_field_accessor::<_, CurrencyPair>(
+        fields.push(::protobuf::reflect::rt::v2::make_simpler_field_accessor::<_, _>(
             "currency_pair",
             |m: &GetPriceRequest| { &m.currency_pair },
             |m: &mut GetPriceRequest| { &mut m.currency_pair },
@@ -599,7 +599,7 @@ impl ::protobuf::Message for GetPriceRequest {
         while let Some(tag) = is.read_raw_tag_or_eof()? {
             match tag {
                 10 => {
-                    ::protobuf::rt::read_singular_message_into_field(is, &mut self.currency_pair)?;
+                    self.currency_pair = is.read_string()?;
                 },
                 tag => {
                     ::protobuf::rt::read_unknown_or_skip_group(tag, is, self.special_fields.mut_unknown_fields())?;
@@ -613,9 +613,8 @@ impl ::protobuf::Message for GetPriceRequest {
     #[allow(unused_variables)]
     fn compute_size(&self) -> u64 {
         let mut my_size = 0;
-        if let Some(v) = self.currency_pair.as_ref() {
-            let len = v.compute_size();
-            my_size += 1 + ::protobuf::rt::compute_raw_varint64_size(len) + len;
+        if !self.currency_pair.is_empty() {
+            my_size += ::protobuf::rt::string_size(1, &self.currency_pair);
         }
         my_size += ::protobuf::rt::unknown_fields_size(self.special_fields.unknown_fields());
         self.special_fields.cached_size().set(my_size as u32);
@@ -623,8 +622,8 @@ impl ::protobuf::Message for GetPriceRequest {
     }
 
     fn write_to_with_cached_sizes(&self, os: &mut ::protobuf::CodedOutputStream<'_>) -> ::protobuf::Result<()> {
-        if let Some(v) = self.currency_pair.as_ref() {
-            ::protobuf::rt::write_message_field_with_cached_size(1, v, os)?;
+        if !self.currency_pair.is_empty() {
+            os.write_string(1, &self.currency_pair)?;
         }
         os.write_unknown_fields(self.special_fields.unknown_fields())?;
         ::std::result::Result::Ok(())
@@ -649,7 +648,7 @@ impl ::protobuf::Message for GetPriceRequest {
 
     fn default_instance() -> &'static GetPriceRequest {
         static instance: GetPriceRequest = GetPriceRequest {
-            currency_pair: ::protobuf::MessageField::none(),
+            currency_pair: ::std::string::String::new(),
             special_fields: ::protobuf::SpecialFields::new(),
         };
         &instance
@@ -1122,25 +1121,24 @@ static file_descriptor_proto_data: &'static [u8] = b"\
     \x08\xc8\xde\x1f\0\x90\xdf\x1f\x01\x12!\n\x0cblock_height\x18\x03\x20\
     \x01(\x04R\x0bblockHeight\"\x1c\n\x1aGetAllCurrencyPairsRequest\"Y\n\x1b\
     GetAllCurrencyPairsResponse\x12:\n\x0ecurrency_pairs\x18\x01\x20\x03(\
-    \x0b2\r.CurrencyPairR\rcurrencyPairsB\x04\xc8\xde\x1f\0\"K\n\x0fGetPrice\
-    Request\x128\n\rcurrency_pair\x18\x01\x20\x01(\x0b2\r.CurrencyPairR\x0cc\
-    urrencyPairB\x04\xc8\xde\x1f\0\"}\n\x10GetPriceResponse\x12'\n\x05price\
-    \x18\x01\x20\x01(\x0b2\x0b.QuotePriceR\x05priceB\x04\xc8\xde\x1f\x01\x12\
-    \x14\n\x05nonce\x18\x02\x20\x01(\x04R\x05nonce\x12\x1a\n\x08decimals\x18\
-    \x03\x20\x01(\x04R\x08decimals\x12\x0e\n\x02id\x18\x04\x20\x01(\x04R\x02\
-    id\">\n\x10GetPricesRequest\x12*\n\x11currency_pair_ids\x18\x01\x20\x03(\
-    \tR\x0fcurrencyPairIds\"D\n\x11GetPricesResponse\x12/\n\x06prices\x18\
-    \x01\x20\x03(\x0b2\x11.GetPriceResponseR\x06pricesB\x04\xc8\xde\x1f\0:O\
-    \n\x10goproto_stringer\x18\x83\xf4\x03\x20\x01(\x08\x12\x1f.google.proto\
-    buf.MessageOptionsR\x0fgoprotoStringer\x88\x01\x01:@\n\x08stringer\x18\
-    \xc0\x8b\x04\x20\x01(\x08\x12\x1f.google.protobuf.MessageOptionsR\x08str\
-    inger\x88\x01\x01:>\n\x08nullable\x18\xe9\xfb\x03\x20\x01(\x08\x12\x1d.g\
-    oogle.protobuf.FieldOptionsR\x08nullable\x88\x01\x01:B\n\ncustomtype\x18\
-    \xeb\xfb\x03\x20\x01(\t\x12\x1d.google.protobuf.FieldOptionsR\ncustomtyp\
-    e\x88\x01\x01:<\n\x07stdtime\x18\xf2\xfb\x03\x20\x01(\x08\x12\x1d.google\
-    .protobuf.FieldOptionsR\x07stdtime\x88\x01\x01:7\n\x06scalar\x18\xca\xd6\
-    \x05\x20\x01(\t\x12\x1d.google.protobuf.FieldOptionsR\x06scalarb\x06prot\
-    o3\
+    \x0b2\r.CurrencyPairR\rcurrencyPairsB\x04\xc8\xde\x1f\0\"6\n\x0fGetPrice\
+    Request\x12#\n\rcurrency_pair\x18\x01\x20\x01(\tR\x0ccurrencyPair\"}\n\
+    \x10GetPriceResponse\x12'\n\x05price\x18\x01\x20\x01(\x0b2\x0b.QuotePric\
+    eR\x05priceB\x04\xc8\xde\x1f\x01\x12\x14\n\x05nonce\x18\x02\x20\x01(\x04\
+    R\x05nonce\x12\x1a\n\x08decimals\x18\x03\x20\x01(\x04R\x08decimals\x12\
+    \x0e\n\x02id\x18\x04\x20\x01(\x04R\x02id\">\n\x10GetPricesRequest\x12*\n\
+    \x11currency_pair_ids\x18\x01\x20\x03(\tR\x0fcurrencyPairIds\"D\n\x11Get\
+    PricesResponse\x12/\n\x06prices\x18\x01\x20\x03(\x0b2\x11.GetPriceRespon\
+    seR\x06pricesB\x04\xc8\xde\x1f\0:O\n\x10goproto_stringer\x18\x83\xf4\x03\
+    \x20\x01(\x08\x12\x1f.google.protobuf.MessageOptionsR\x0fgoprotoStringer\
+    \x88\x01\x01:@\n\x08stringer\x18\xc0\x8b\x04\x20\x01(\x08\x12\x1f.google\
+    .protobuf.MessageOptionsR\x08stringer\x88\x01\x01:>\n\x08nullable\x18\
+    \xe9\xfb\x03\x20\x01(\x08\x12\x1d.google.protobuf.FieldOptionsR\x08nulla\
+    ble\x88\x01\x01:B\n\ncustomtype\x18\xeb\xfb\x03\x20\x01(\t\x12\x1d.googl\
+    e.protobuf.FieldOptionsR\ncustomtype\x88\x01\x01:<\n\x07stdtime\x18\xf2\
+    \xfb\x03\x20\x01(\x08\x12\x1d.google.protobuf.FieldOptionsR\x07stdtime\
+    \x88\x01\x01:7\n\x06scalar\x18\xca\xd6\x05\x20\x01(\t\x12\x1d.google.pro\
+    tobuf.FieldOptionsR\x06scalarb\x06proto3\
 ";
 
 /// `FileDescriptorProto` object which was a source for this generated file
