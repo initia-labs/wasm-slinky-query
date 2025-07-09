@@ -1,9 +1,9 @@
 // rust proto generate code
 
-use protobuf_codegen::{Codegen, Customize, CustomizeCallback};
-use protoc_bin_vendored;
 use protobuf::descriptor::field_descriptor_proto::Type;
 use protobuf::reflect::FieldDescriptor;
+use protobuf_codegen::{Codegen, Customize, CustomizeCallback};
+use protoc_bin_vendored;
 
 fn main() {
     struct GenSerde;
@@ -25,16 +25,16 @@ fn main() {
     }
 
     Codegen::new()
-    // Use `protoc` parser, optional.
-    .protoc()
-    // Use `protoc-bin-vendored` bundled protoc command, optional.
-    .protoc_path(&protoc_bin_vendored::protoc_bin_path().unwrap())
-    // All inputs and imports from the inputs must reside in `includes` directories.
-    .includes(&["src/protos"])
-    // Inputs must reside in some of include paths.
-    .input("src/protos/slinky_oracle.proto")
-    // Specify output directory relative to Cargo output directory.
-    .out_dir("src/")
-    .customize_callback(GenSerde)
-    .run_from_script();
+        // Use `protoc` parser, optional.
+        .protoc()
+        // Use `protoc-bin-vendored` bundled protoc command, optional.
+        .protoc_path(&protoc_bin_vendored::protoc_bin_path().unwrap())
+        // All inputs and imports from the inputs must reside in `includes` directories.
+        .includes(&["src/protos"])
+        // Inputs must reside in some of include paths.
+        .input("src/protos/slinky_oracle.proto")
+        // Specify output directory relative to Cargo output directory.
+        .out_dir("src/")
+        .customize_callback(GenSerde)
+        .run_from_script();
 }
