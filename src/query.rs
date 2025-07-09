@@ -1,10 +1,12 @@
 use std::str::FromStr;
 
-use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdResult, Timestamp, Uint256};
+use cosmwasm_std::{to_json_binary, Binary, Deps, Empty, Env, QueryRequest, StdResult, Uint256};
+use slinky_wasm::oracle::{GetPriceResponse, GetPricesResponse, QuotePrice, GetAllCurrencyPairsResponse};
 
-use crate::state::Contract;
+
 use crate::msgs::QueryMsg;
 use crate::slinky_oracle::{GetAllCurrencyPairsRequest, GetPricesRequest, GetPriceRequest};
+use crate::state::Contract;
 use crate::timestamp::convert_iso_string_to_timestamp;
 use protobuf::Message;
 
@@ -15,31 +17,44 @@ impl<'a> Contract {
             special_fields: ::protobuf::SpecialFields::new()
         };
         let bytes = request.write_to_bytes().unwrap();
-        
+
         let data = Binary::from(bytes);
         let request = QueryRequest::Stargate{path: "/connect.oracle.v2.Query/GetPrice".to_string(), data};
         let res: GetPriceResponseRaw = deps.querier.query(&request)?;
         Ok(convert_raw_price_response(&res))
     }
 
-    fn get_prices(&self, deps: Deps, _env: Env, pair_ids: Vec<String>) -> StdResult<GetPricesResponse> {
-        let request = GetPricesRequest { 
+    fn get_prices(
+        &self,
+        deps: Deps,
+        _env: Env,
+        pair_ids: Vec<String>,
+    ) -> StdResult<GetPricesResponse> {
+        let request = GetPricesRequest {
             currency_pair_ids: pair_ids,
-            special_fields: ::protobuf::SpecialFields::new()
+            special_fields: ::protobuf::SpecialFields::new(),
         };
         let bytes = request.write_to_bytes().unwrap();
-        
+
         let data = Binary::from(bytes);
         let request = QueryRequest::Stargate{path: "/connect.oracle.v2.Query/GetPrices".to_string(), data};
         let raw_res: GetPricesResponseRaw = deps.querier.query(&request)?;
         let res = GetPricesResponse {
-            prices: raw_res.prices.into_iter().map(|raw| convert_raw_price_response(&raw)).collect()
+            prices: raw_res
+                .prices
+                .into_iter()
+                .map(|raw| convert_raw_price_response(&raw))
+                .collect(),
         };
         Ok(res)
     }
-    fn get_all_currency_pairs(&self, deps: Deps, _env: Env) -> StdResult<GetAllCurrencyPairsResponse> {
-        let request = GetAllCurrencyPairsRequest { 
-            special_fields: ::protobuf::SpecialFields::new()
+    fn get_all_currency_pairs(
+        &self,
+        deps: Deps,
+        _env: Env,
+    ) -> StdResult<GetAllCurrencyPairsResponse> {
+        let request = GetAllCurrencyPairsRequest {
+            special_fields: ::protobuf::SpecialFields::new(),
         };
         let bytes = request.write_to_bytes().unwrap();
 
@@ -49,7 +64,6 @@ impl<'a> Contract {
         Ok(res)
     }
 }
-
 
 impl<'a> Contract {
     pub fn query(&self, deps: Deps, env: Env, msg: QueryMsg) -> StdResult<Binary> {
@@ -86,46 +100,12 @@ pub struct GetPriceResponseRaw {
 
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct GetPricesResponseRaw {
-    pub prices: Vec<GetPriceResponseRaw>
+    pub prices: Vec<GetPriceResponseRaw>,
 }
-
 
 #[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
 pub struct QuotePriceRaw {
     pub price: String,
     pub block_timestamp: String,
     pub block_height: String,
-}
-
-// query response
-
-#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct GetPriceResponse {
-    pub price: QuotePrice,
-    pub nonce: u64,
-    pub decimals: u64,
-    pub id: u64,
-}
-
-#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct GetPricesResponse {
-    pub prices: Vec<GetPriceResponse>
-}
-
-#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct QuotePrice {
-    pub price: Uint256,
-    pub block_timestamp: Timestamp,
-    pub block_height: u64,
-}
-
-#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
-pub struct GetAllCurrencyPairsResponse {
-    pub currency_pairs: Vec<CurrencyPairResponse>,
-}
-#[derive(Clone, Debug, PartialEq, serde::Deserialize, serde::Serialize)]
-#[allow(non_snake_case)]
-pub struct CurrencyPairResponse {
-    pub Base: String,
-    pub Quote: String,
 }
